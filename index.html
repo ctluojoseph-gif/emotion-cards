@@ -1,3 +1,10 @@
+這就為你奉上換上「沉靜大地與微光」高雅配色的完整程式碼。
+
+在這個版本中，我使用了 Tailwind CSS 的大地色系（Stone）、鼠尾草綠（Teal）、藕紫灰（Rose）以及象徵微光的暖橘色（Orange）來取代原本生硬的紅綠藍。同時，我也稍微調整了卡牌的陰影與懸浮效果，讓整體的視覺體驗更柔和、溫潤。
+
+請直接複製以下程式碼，覆蓋你本機端的 `index.html`，真實金鑰已為你完整保留：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -6,118 +13,132 @@
   <title>情緒卡牌與反思畫布</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f3f4f6; }
-    .card-hover:hover { transform: translateY(-2px); transition: all 0.2s; }
+    body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #f5f4f1; color: #3b3a37; }
+    .card-hover { box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     /* 隱藏捲軸但可滾動 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* 自訂柔和顏色配置 */
+    .bg-oatmeal { background-color: #f5f4f1; }
+    .text-charcoal { color: #3b3a37; }
   </style>
 </head>
-<body>
+<body class="bg-oatmeal text-charcoal">
   <div id="app" class="min-h-screen p-4 md:p-8">
     
-    <div v-if="!currentUser && !isGuest" class="max-w-md mx-auto mt-20 bg-white p-8 rounded-xl shadow-lg text-center">
-      <h1 @click="handleTitleClick" class="text-2xl font-bold text-gray-800 mb-6 cursor-pointer select-none">情緒卡牌與反思畫布</h1>
+    <div v-if="!currentUser && !isGuest" class="max-w-md mx-auto mt-20 bg-white p-8 rounded-2xl shadow-sm border border-stone-200 text-center">
+      <h1 @click="handleTitleClick" class="text-2xl font-bold text-stone-800 mb-6 cursor-pointer select-none tracking-wide">情緒卡牌與反思畫布</h1>
       
-      <input v-model="loginName" @keyup.enter="login" type="text" placeholder="請輸入您的姓名或暱稱" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button @click="login" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 mb-4 transition">進入畫布</button>
+      <input v-model="loginName" @keyup.enter="login" type="text" placeholder="請輸入您的姓名或暱稱" class="w-full p-3 border border-stone-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 transition">
+      <button @click="login" class="w-full bg-orange-600 text-white font-semibold py-3 rounded-xl hover:bg-orange-700 shadow-sm mb-4 transition duration-300">進入畫布</button>
       
       <div class="relative flex py-2 items-center">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">或</span>
-        <div class="flex-grow border-t border-gray-300"></div>
+        <div class="flex-grow border-t border-stone-200"></div>
+        <span class="flex-shrink-0 mx-4 text-stone-400 text-sm">或</span>
+        <div class="flex-grow border-t border-stone-200"></div>
       </div>
       
-      <button @click="enterGuestMode" class="w-full bg-gray-100 text-gray-600 font-semibold py-3 rounded-lg hover:bg-gray-200 border border-gray-300 transition">直接進入瀏覽 (訪客模式)</button>
+      <button @click="enterGuestMode" class="w-full bg-stone-100 text-stone-600 font-semibold py-3 rounded-xl hover:bg-stone-200 border border-stone-200 transition duration-300">直接進入瀏覽 (訪客模式)</button>
     </div>
 
     <div v-else class="max-w-7xl mx-auto flex flex-col gap-6">
       
-      <div v-if="isAdmin" class="bg-gray-800 text-white p-4 rounded-xl shadow flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-2">
-          <span class="bg-yellow-500 text-gray-900 px-2 py-1 rounded text-xs font-bold">管理員模式</span>
-          <span class="text-sm">切換瀏覽畫布：</span>
-          <select v-model="viewingSession" @change="changeViewingSession" class="bg-gray-700 text-white border border-gray-600 rounded p-1 text-sm focus:outline-none">
+      <div v-if="isAdmin" class="bg-slate-800 text-slate-100 p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="bg-amber-600 text-white px-2 py-1 rounded text-xs font-bold tracking-wider">管理員模式</span>
+          <span class="text-sm text-slate-300">切換瀏覽畫布：</span>
+          <select v-model="viewingSession" @change="changeViewingSession" class="bg-slate-700 text-slate-100 border border-slate-600 rounded-lg p-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500">
             <option value="legacy" v-if="hasLegacyData">舊版紀錄 (Legacy)</option>
             <option v-for="session in availableSessions" :key="session" :value="session">{{ session }}</option>
           </select>
         </div>
         <div class="flex items-center gap-4">
-          <span class="text-sm text-gray-400">目前學員所在畫布: <span class="text-white font-bold">{{ globalSession }}</span></span>
-          <button @click="createNewSession" class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded font-semibold text-sm transition">
+          <span class="text-sm text-slate-400">目前學員所在畫布: <span class="text-amber-400 font-mono font-bold">{{ globalSession }}</span></span>
+          <button @click="createNewSession" class="bg-slate-600 hover:bg-slate-500 border border-slate-500 text-white px-4 py-2 rounded-lg font-semibold text-sm transition">
             + 建立新畫布 (強制全體換房)
           </button>
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-xl shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 class="text-xl font-bold text-gray-800">
+          <h2 class="text-xl font-bold text-stone-800 tracking-wide">
             {{ isGuest ? '訪客瀏覽模式' : '歡迎，' + currentUser }}
           </h2>
-          <p class="text-sm text-gray-500 mt-1">
-            當前畫布：<span class="font-mono bg-gray-100 px-1 rounded">{{ viewingSession === 'legacy' ? '舊版紀錄' : viewingSession }}</span>
-            | 共 {{ totalNotes }} 張卡牌
+          <p class="text-sm text-stone-500 mt-2 flex items-center gap-2">
+            當前畫布：<span class="font-mono bg-stone-100 text-stone-600 px-2 py-0.5 rounded">{{ viewingSession === 'legacy' ? '舊版紀錄' : viewingSession }}</span>
+            <span class="text-stone-300">|</span> 共 <span class="font-bold text-stone-700">{{ totalNotes }}</span> 張卡牌
           </p>
         </div>
         
         <div class="w-full md:w-2/3 lg:w-1/2">
-          <h3 class="text-sm font-semibold text-gray-600 mb-2 border-b pb-1">當前畫布情緒頻率統計</h3>
-          <div class="flex flex-wrap gap-2 max-h-20 overflow-y-auto no-scrollbar">
-            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm border border-gray-200">
-              <span class="font-medium text-gray-700 mr-2">{{ stat.emotion }}</span>
-              <span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">{{ stat.count }}</span>
+          <h3 class="text-sm font-semibold text-stone-500 mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            當前畫布情緒頻率統計
+          </h3>
+          <div class="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar pr-2">
+            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center bg-stone-50 rounded-full px-3 py-1.5 text-sm border border-stone-200 shadow-sm">
+              <span class="font-medium text-stone-700 mr-2">{{ stat.emotion }}</span>
+              <span class="bg-stone-200 text-stone-600 font-bold text-xs px-2 py-0.5 rounded-full">{{ stat.count }}</span>
             </div>
-            <span v-if="wordStats.length === 0" class="text-sm text-gray-400">目前尚無統計資料</span>
+            <span v-if="wordStats.length === 0" class="text-sm text-stone-400 italic">目前尚無統計資料</span>
           </div>
         </div>
       </div>
 
       <div class="flex flex-col lg:flex-row gap-6">
         
-        <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow h-[75vh] flex flex-col">
-          <h3 class="text-lg font-bold mb-2 border-b pb-2 flex justify-between items-center">
-            1. 選擇你的情緒
-            <span v-if="isGuest" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-normal">訪客不可選取</span>
-            <span v-else class="text-xs text-gray-400 font-normal">共 80 張</span>
+        <div class="w-full lg:w-1/3 bg-white p-6 rounded-2xl shadow-sm border border-stone-100 h-[72vh] flex flex-col">
+          <h3 class="text-lg font-bold text-stone-800 mb-4 flex justify-between items-center">
+            選擇你的情緒
+            <span v-if="isGuest" class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded font-normal border border-rose-100">訪客不可選取</span>
+            <span v-else class="text-xs text-stone-400 font-normal">共 80 張</span>
           </h3>
           
           <div class="flex-grow overflow-y-auto pr-2 no-scrollbar">
-            <div class="flex flex-wrap gap-2 pb-4">
+            <div class="flex flex-wrap gap-2.5 pb-4">
               <button v-for="card in cards" :key="card.emotion" 
                 @click="!isGuest && openNoteModal(card)"
                 :disabled="isGuest"
-                class="px-4 py-2 rounded-full border text-sm font-semibold transition"
+                class="px-4 py-2 rounded-full border text-sm font-semibold tracking-wide"
                 :class="[
-                  isGuest ? 'opacity-60 cursor-not-allowed' : 'card-hover cursor-pointer',
-                  card.type === 'positive' ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                  isGuest ? 'opacity-50 cursor-not-allowed' : 'card-hover cursor-pointer',
+                  card.type === 'positive' 
+                    ? 'bg-teal-50/50 border-teal-200 text-teal-800 hover:bg-teal-50' 
+                    : 'bg-rose-50/50 border-rose-200 text-rose-800 hover:bg-rose-50'
                 ]">
                 {{ card.emotion }}
               </button>
-              <button @click="!isGuest && openCustomModal()" :disabled="isGuest" class="px-4 py-2 rounded-full border-2 border-dashed border-gray-400 text-gray-600 text-sm font-semibold transition" :class="isGuest ? 'opacity-60 cursor-not-allowed' : 'card-hover hover:bg-gray-50'">
+              <button @click="!isGuest && openCustomModal()" :disabled="isGuest" class="px-4 py-2 rounded-full border-2 border-dashed border-stone-300 text-stone-500 text-sm font-semibold transition duration-300" :class="isGuest ? 'opacity-50 cursor-not-allowed' : 'card-hover hover:bg-stone-50 hover:text-stone-700 hover:border-stone-400'">
                 + 自訂情緒
               </button>
             </div>
           </div>
         </div>
 
-        <div class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow h-[75vh] flex flex-col bg-gray-50">
-          <h3 class="text-lg font-bold mb-4 border-b pb-2">2. 共同反思畫布</h3>
-          <div class="flex-grow overflow-y-auto no-scrollbar">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4">
-              <div v-for="(note, id) in sharedBoard" :key="id" class="bg-white p-4 rounded-lg shadow border-l-4 hover:shadow-md transition"
-                :class="note.type === 'positive' ? 'border-green-500' : 'border-red-400'">
-                <div class="flex justify-between items-start mb-2">
-                  <span class="px-2 py-1 rounded text-xs font-bold"
-                    :class="note.type === 'positive' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+        <div class="w-full lg:w-2/3 p-6 rounded-2xl h-[72vh] flex flex-col border border-stone-200 bg-[#fbfaf8] shadow-inner">
+          <h3 class="text-lg font-bold text-stone-800 mb-5 flex items-center gap-2">
+            共同反思畫布
+          </h3>
+          <div class="flex-grow overflow-y-auto pr-2 no-scrollbar">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-4">
+              <div v-for="(note, id) in sharedBoard" :key="id" class="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition duration-300 relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="note.type === 'positive' ? 'bg-teal-400/80' : 'bg-rose-400/80'"></div>
+                
+                <div class="flex justify-between items-start mb-3 pl-2">
+                  <span class="px-2.5 py-1 rounded-md text-xs font-bold tracking-wide"
+                    :class="note.type === 'positive' ? 'bg-teal-50 text-teal-800 border border-teal-100' : 'bg-rose-50 text-rose-800 border border-rose-100'">
                     {{ note.emotion }} {{ note.isCustom ? '(自訂)' : '' }}
                   </span>
-                  <span class="text-xs font-medium text-gray-500">{{ note.userName }}</span>
+                  <span class="text-xs font-medium text-stone-400 bg-stone-50 px-2 py-0.5 rounded">{{ note.userName }}</span>
                 </div>
-                <p class="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">{{ note.content }}</p>
+                <p class="text-stone-700 whitespace-pre-wrap text-sm leading-relaxed pl-2">{{ note.content }}</p>
               </div>
-              <div v-if="Object.keys(sharedBoard).length === 0" class="col-span-full text-center py-10 text-gray-400">
-                目前畫布空空如也，等待大家分享...
+              
+              <div v-if="Object.keys(sharedBoard).length === 0" class="col-span-full flex flex-col items-center justify-center py-20 text-stone-400">
+                <svg class="w-12 h-12 mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <p class="tracking-wide">畫布空空如也，等待大家的分享...</p>
               </div>
             </div>
           </div>
@@ -125,35 +146,39 @@
       </div>
     </div>
 
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
-        <h3 class="text-xl font-bold mb-4">
-          你選擇了：<span :class="currentCard.type === 'positive' ? 'text-green-600' : 'text-red-500'">{{ currentCard.emotion }}</span>
+    <div v-if="showModal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+      <div class="bg-white rounded-2xl p-7 w-full max-w-md shadow-2xl border border-stone-100 transform transition-all">
+        <h3 class="text-xl font-bold mb-5 text-stone-800">
+          你選擇了：<span :class="currentCard.type === 'positive' ? 'text-teal-700' : 'text-rose-700'">{{ currentCard.emotion }}</span>
         </h3>
-        <textarea v-model="noteContent" rows="4" placeholder="為什麼選擇這個情緒？寫下你的反思..." class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        <div class="flex justify-end gap-2">
-          <button @click="showModal = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">取消</button>
-          <button @click="submitNote" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">釘上畫布</button>
+        <textarea v-model="noteContent" rows="5" placeholder="成為一顆打火石，寫下你為何選擇這個情緒..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
+        <div class="flex justify-end gap-3">
+          <button @click="showModal = false" class="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-100 rounded-xl transition duration-200">取消</button>
+          <button @click="submitNote" class="px-5 py-2.5 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 shadow-sm transition duration-200">釘上畫布</button>
         </div>
       </div>
     </div>
 
-    <div v-if="showCustomModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
-        <h3 class="text-xl font-bold mb-4">新增自訂情緒</h3>
-        <input v-model="customEmotion" type="text" placeholder="輸入情緒詞彙 (例如：百感交集)" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <div class="flex gap-4 mb-4">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" v-model="customType" value="positive"> <span class="text-green-600 font-semibold">正向/高能量</span>
+    <div v-if="showCustomModal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+      <div class="bg-white rounded-2xl p-7 w-full max-w-md shadow-2xl border border-stone-100 transform transition-all">
+        <h3 class="text-xl font-bold mb-5 text-stone-800">新增自訂情緒</h3>
+        <input v-model="customEmotion" type="text" placeholder="輸入情緒詞彙 (例如：百感交集)" class="w-full p-3 border border-stone-200 rounded-xl mb-5 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50">
+        
+        <div class="flex gap-6 mb-6 px-1">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <input type="radio" v-model="customType" value="positive" class="text-teal-600 focus:ring-teal-500"> 
+            <span class="text-teal-800 font-medium group-hover:text-teal-600 transition">正向 / 暖色系</span>
           </label>
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="radio" v-model="customType" value="negative"> <span class="text-red-500 font-semibold">負向/低能量</span>
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <input type="radio" v-model="customType" value="negative" class="text-rose-600 focus:ring-rose-500"> 
+            <span class="text-rose-800 font-medium group-hover:text-rose-600 transition">負向 / 沉澱系</span>
           </label>
         </div>
-        <textarea v-model="noteContent" rows="3" placeholder="寫下你的反思..." class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-        <div class="flex justify-end gap-2">
-          <button @click="showCustomModal = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">取消</button>
-          <button @click="submitCustomNote" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">釘上畫布</button>
+        
+        <textarea v-model="noteContent" rows="4" placeholder="成為一顆打火石，寫下你的反思..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
+        <div class="flex justify-end gap-3">
+          <button @click="showCustomModal = false" class="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-100 rounded-xl transition duration-200">取消</button>
+          <button @click="submitCustomNote" class="px-5 py-2.5 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 shadow-sm transition duration-200">釘上畫布</button>
         </div>
       </div>
     </div>
@@ -161,12 +186,12 @@
   </div>
 
   <script type="module">
-    import { createApp, ref, computed, onMounted, watch } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+    import { createApp, ref, computed, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js'
     import { getDatabase, ref as dbRef, onValue, push, set, get } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js'
 
     // ==========================================
-    // 您的 Firebase Config (已更新)
+    // 您的 Firebase Config (保留真實金鑰不變)
     // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyBZH3hJleq3Z8AUitrhQquTcYefi8QZAsU",
@@ -184,28 +209,23 @@
 
     createApp({
       setup() {
-        // 使用者狀態
         const currentUser = ref('');
         const loginName = ref('');
         const isGuest = ref(false);
         
-        // 管理員權限與密碼
-        // 管理者密碼設定為 "ctluo"
+        // 管理員密碼: ctluo
         const isAdmin = ref(false);
         let clickCount = 0;
         let clickTimer = null;
 
-        // 畫布期別狀態
         const globalSession = ref('default'); 
         const viewingSession = ref('default'); 
         const availableSessions = ref([]);
         const hasLegacyData = ref(false);
 
-        // 畫布資料
         const sharedBoard = ref({});
         let currentNotesListener = null;
         
-        // Modal 狀態
         const showModal = ref(false);
         const showCustomModal = ref(false);
         const currentCard = ref({});
@@ -213,36 +233,29 @@
         const customEmotion = ref('');
         const customType = ref('positive');
 
-        // ==========================================
-        // 擴充版 80 張情緒卡牌 (40 正向 + 40 負向)
-        // ==========================================
+        // 80 張擴充版情緒卡牌
         const cards = ref([
-          // 原始 25 張正向
+          // 40 張正向
           { emotion: '充實', type: 'positive' }, { emotion: '振奮', type: 'positive' }, { emotion: '平靜', type: 'positive' }, { emotion: '喜悅', type: 'positive' }, { emotion: '充滿希望', type: 'positive' },
           { emotion: '感恩', type: 'positive' }, { emotion: '豁然開朗', type: 'positive' }, { emotion: '自信', type: 'positive' }, { emotion: '放鬆', type: 'positive' }, { emotion: '滿足', type: 'positive' },
           { emotion: '期待', type: 'positive' }, { emotion: '熱情', type: 'positive' }, { emotion: '驕傲', type: 'positive' }, { emotion: '受到啟發', type: 'positive' }, { emotion: '感到安全', type: 'positive' },
           { emotion: '自由', type: 'positive' }, { emotion: '充滿活力', type: 'positive' }, { emotion: '輕鬆', type: 'positive' }, { emotion: '欣慰', type: 'positive' }, { emotion: '勇敢', type: 'positive' },
           { emotion: '專注', type: 'positive' }, { emotion: '樂觀', type: 'positive' }, { emotion: '被理解', type: 'positive' }, { emotion: '溫暖', type: 'positive' }, { emotion: '踏實', type: 'positive' },
-          // 新增 15 張正向
           { emotion: '釋懷', type: 'positive' }, { emotion: '躍躍欲試', type: 'positive' }, { emotion: '欣喜', type: 'positive' }, { emotion: '篤定', type: 'positive' }, { emotion: '澄明', type: 'positive' },
           { emotion: '游刃有餘', type: 'positive' }, { emotion: '充滿底氣', type: 'positive' }, { emotion: '坦然', type: 'positive' }, { emotion: '陶醉', type: 'positive' }, { emotion: '雀躍', type: 'positive' },
           { emotion: '振奮人心', type: 'positive' }, { emotion: '備受肯定', type: 'positive' }, { emotion: '充滿靈感', type: 'positive' }, { emotion: '怡然自得', type: 'positive' }, { emotion: '清爽', type: 'positive' },
           
-          // 原始 25 張負向
+          // 40 張負向
           { emotion: '疲憊', type: 'negative' }, { emotion: '困惑', type: 'negative' }, { emotion: '焦慮', type: 'negative' }, { emotion: '沮喪', type: 'negative' }, { emotion: '緊張', type: 'negative' },
           { emotion: '無力', type: 'negative' }, { emotion: '孤單', type: 'negative' }, { emotion: '壓力大', type: 'negative' }, { emotion: '煩躁', type: 'negative' }, { emotion: '迷惘', type: 'negative' },
           { emotion: '失落', type: 'negative' }, { emotion: '生氣', type: 'negative' }, { emotion: '擔憂', type: 'negative' }, { emotion: '害怕', type: 'negative' }, { emotion: '沉重', type: 'negative' },
           { emotion: '不安', type: 'negative' }, { emotion: '委屈', type: 'negative' }, { emotion: '挫折', type: 'negative' }, { emotion: '猶豫', type: 'negative' }, { emotion: '煩惱', type: 'negative' },
           { emotion: '枯燥', type: 'negative' }, { emotion: '緊繃', type: 'negative' }, { emotion: '提心吊膽', type: 'negative' }, { emotion: '失望', type: 'negative' }, { emotion: '疲倦', type: 'negative' },
-          // 新增 15 張負向
           { emotion: '拘謹', type: 'negative' }, { emotion: '匱乏', type: 'negative' }, { emotion: '如履薄冰', type: 'negative' }, { emotion: '懊悔', type: 'negative' }, { emotion: '恐慌', type: 'negative' },
           { emotion: '窒息', type: 'negative' }, { emotion: '煩心', type: 'negative' }, { emotion: '孤立無援', type: 'negative' }, { emotion: '忐忑', type: 'negative' }, { emotion: '乏味', type: 'negative' },
           { emotion: '焦頭爛額', type: 'negative' }, { emotion: '倦怠', type: 'negative' }, { emotion: '膽怯', type: 'negative' }, { emotion: '氣餒', type: 'negative' }, { emotion: '鬱悶', type: 'negative' }
         ]);
 
-        // ==========================================
-        // 登入與權限邏輯
-        // ==========================================
         const login = () => {
           if (loginName.value.trim()) currentUser.value = loginName.value.trim();
         };
@@ -259,7 +272,7 @@
             if (pwd === "ctluo") {
               isAdmin.value = true;
               alert("身份驗證成功，已解鎖管理員工具列。");
-              loadAdminData(); // 載入所有期別供切換
+              loadAdminData(); 
             } else {
               alert("密碼錯誤");
             }
@@ -269,40 +282,30 @@
           clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
         };
 
-        // ==========================================
-        // 資料庫與期別邏輯
-        // ==========================================
-        
-        // 監聽當前指標，學員會跟著這個指標連線
         onMounted(() => {
           const stateRef = dbRef(db, 'appState/currentSession');
           onValue(stateRef, (snapshot) => {
             const session = snapshot.val();
             if (session) {
               globalSession.value = session;
-              // 如果不是管理員，強制綁定視野到 globalSession
               if (!isAdmin.value) {
                 viewingSession.value = session;
                 listenToBoard(session);
               } else if (viewingSession.value === 'default') {
-                // 管理員剛登入時，預設跟隨 global
                 viewingSession.value = session;
                 listenToBoard(session);
               }
             } else {
-              // 初次使用系統，沒有任何 session 時
               globalSession.value = '尚未建立期別';
-              if(viewingSession.value === 'default' && !isAdmin.value) listenToBoard('legacy'); // 預設降級讀取舊版
+              if(viewingSession.value === 'default' && !isAdmin.value) listenToBoard('legacy');
             }
           });
           
-          // 檢查是否有舊版遺留資料 (向下相容)
           get(dbRef(db, 'notes')).then((snapshot) => {
             if (snapshot.exists()) hasLegacyData.value = true;
           });
         });
 
-        // 管理員載入所有期別清單
         const loadAdminData = () => {
           onValue(dbRef(db, 'sessions'), (snapshot) => {
             if (snapshot.exists()) {
@@ -311,13 +314,10 @@
           });
         };
 
-        // 切換資料庫監聽節點
         const listenToBoard = (sessionName) => {
-          if (currentNotesListener) currentNotesListener(); // 取消先前的監聽
-          
+          if (currentNotesListener) currentNotesListener(); 
           let targetPath = sessionName === 'legacy' ? 'notes' : `sessions/${sessionName}/notes`;
           const notesRef = dbRef(db, targetPath);
-          
           currentNotesListener = onValue(notesRef, (snapshot) => {
             sharedBoard.value = snapshot.val() || {};
           });
@@ -327,7 +327,6 @@
           listenToBoard(viewingSession.value);
         };
 
-        // 管理員建立新期別
         const createNewSession = async () => {
           const today = new Date();
           const dateStr = today.getFullYear().toString() + 
@@ -344,7 +343,6 @@
           
           const newSessionId = `${dateStr}-${String(maxSuffix + 1).padStart(2, '0')}`;
           
-          // 更新全域指標，所有學員的畫面會瞬間切換
           set(dbRef(db, 'appState/currentSession'), newSessionId);
           alert(`已建立並廣播新畫布：${newSessionId}`);
           
@@ -352,9 +350,6 @@
           listenToBoard(newSessionId);
         };
 
-        // ==========================================
-        // 卡牌與便利貼互動邏輯
-        // ==========================================
         const openNoteModal = (card) => {
           currentCard.value = card;
           noteContent.value = '';
@@ -369,12 +364,10 @@
         };
 
         const pushToDatabase = (emotionData) => {
-          if(isGuest.value) return; // 雙重防呆
-          
+          if(isGuest.value) return; 
           let targetPath = globalSession.value === '尚未建立期別' ? 'notes' : `sessions/${globalSession.value}/notes`;
           const notesRef = dbRef(db, targetPath);
           const newNoteRef = push(notesRef);
-          
           set(newNoteRef, {
             ...emotionData,
             userName: currentUser.value,
@@ -395,9 +388,6 @@
           showCustomModal.value = false;
         };
 
-        // ==========================================
-        // 統計邏輯 (詞彙頻率計算)
-        // ==========================================
         const totalNotes = computed(() => Object.keys(sharedBoard.value).length);
         
         const wordStats = computed(() => {
@@ -405,8 +395,6 @@
           Object.values(sharedBoard.value).forEach(note => {
             counts[note.emotion] = (counts[note.emotion] || 0) + 1;
           });
-          
-          // 轉成陣列並由高到低排序
           return Object.entries(counts)
             .map(([emotion, count]) => ({ emotion, count }))
             .sort((a, b) => b.count - a.count);
@@ -425,3 +413,5 @@
   </script>
 </body>
 </html>
+
+```
