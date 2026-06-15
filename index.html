@@ -71,9 +71,10 @@
             當前畫布情緒頻率統計
           </h3>
           <div class="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar pr-2">
-            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center bg-stone-50 rounded-full px-3 py-1.5 text-sm border border-stone-200 shadow-sm">
-              <span class="font-medium text-stone-700 mr-2">{{ stat.emotion }}</span>
-              <span class="bg-stone-200 text-stone-600 font-bold text-xs px-2 py-0.5 rounded-full">{{ stat.count }}</span>
+            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center rounded-full px-3 py-1.5 text-sm border shadow-sm"
+              :class="stat.type === 'positive' ? 'bg-teal-50 border-teal-200' : 'bg-rose-50 border-rose-200'">
+              <span class="font-medium mr-2" :class="stat.type === 'positive' ? 'text-teal-800' : 'text-rose-800'">{{ stat.emotion }}</span>
+              <span class="font-bold text-xs px-2 py-0.5 rounded-full" :class="stat.type === 'positive' ? 'bg-teal-200 text-teal-800' : 'bg-rose-200 text-rose-800'">{{ stat.count }}</span>
             </div>
             <span v-if="wordStats.length === 0" class="text-sm text-stone-400 italic">目前尚無統計資料</span>
           </div>
@@ -144,7 +145,7 @@
         <h3 class="text-xl font-bold mb-5 text-stone-800">
           你選擇了：<span :class="currentCard.type === 'positive' ? 'text-teal-700' : 'text-rose-700'">{{ currentCard.emotion }}</span>
         </h3>
-        <textarea v-model="noteContent" rows="5" placeholder="寫下你為何選擇這個情緒..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
+        <textarea v-model="noteContent" rows="5" placeholder="成為一顆打火石，寫下你為何選擇這個情緒..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
         <div class="flex justify-end gap-3">
           <button @click="showModal = false" class="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-100 rounded-xl transition duration-200">取消</button>
           <button @click="submitNote" class="px-5 py-2.5 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 shadow-sm transition duration-200">釘上畫布</button>
@@ -383,13 +384,17 @@
 
         const totalNotes = computed(() => Object.keys(sharedBoard.value).length);
         
+        // 更新統計邏輯：保留 type 以供渲染顏色
         const wordStats = computed(() => {
-          const counts = {};
+          const statsMap = {};
           Object.values(sharedBoard.value).forEach(note => {
-            counts[note.emotion] = (counts[note.emotion] || 0) + 1;
+            if (!statsMap[note.emotion]) {
+              statsMap[note.emotion] = { count: 0, type: note.type };
+            }
+            statsMap[note.emotion].count += 1;
           });
-          return Object.entries(counts)
-            .map(([emotion, count]) => ({ emotion, count }))
+          return Object.entries(statsMap)
+            .map(([emotion, data]) => ({ emotion, count: data.count, type: data.type }))
             .sort((a, b) => b.count - a.count);
         });
 
