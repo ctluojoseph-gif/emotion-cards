@@ -70,11 +70,11 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             當前畫布情緒頻率統計
           </h3>
-          <div class="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar pr-2">
-            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center rounded-full px-3 py-1.5 text-sm border shadow-sm"
-              :class="stat.type === 'positive' ? 'bg-teal-50 border-teal-200' : 'bg-rose-50 border-rose-200'">
-              <span class="font-medium mr-2" :class="stat.type === 'positive' ? 'text-teal-800' : 'text-rose-800'">{{ stat.emotion }}</span>
-              <span class="font-bold text-xs px-2 py-0.5 rounded-full" :class="stat.type === 'positive' ? 'bg-teal-200 text-teal-800' : 'bg-rose-200 text-rose-800'">{{ stat.count }}</span>
+          <div class="flex flex-wrap gap-2 max-h-28 overflow-y-auto no-scrollbar pr-2 py-1">
+            <div v-for="(stat, index) in wordStats" :key="index" class="flex items-center rounded-full pl-3 pr-1 py-1 text-sm shadow-sm transition duration-300 hover:shadow-md"
+              :class="stat.type === 'positive' ? 'bg-teal-600 text-white' : (stat.type === 'negative' ? 'bg-rose-500 text-white' : 'bg-stone-500 text-white')">
+              <span class="font-medium mr-2 tracking-wide">{{ stat.emotion }}</span>
+              <span class="font-bold text-xs px-2 py-1 rounded-full bg-white" :class="stat.type === 'positive' ? 'text-teal-700' : (stat.type === 'negative' ? 'text-rose-600' : 'text-stone-600')">{{ stat.count }}</span>
             </div>
             <span v-if="wordStats.length === 0" class="text-sm text-stone-400 italic">目前尚無統計資料</span>
           </div>
@@ -145,7 +145,7 @@
         <h3 class="text-xl font-bold mb-5 text-stone-800">
           你選擇了：<span :class="currentCard.type === 'positive' ? 'text-teal-700' : 'text-rose-700'">{{ currentCard.emotion }}</span>
         </h3>
-        <textarea v-model="noteContent" rows="5" placeholder="成為一顆打火石，寫下你為何選擇這個情緒..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
+        <textarea v-model="noteContent" rows="5" placeholder="寫下你為何選擇這個情緒..." class="w-full p-4 border border-stone-200 rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-stone-50 resize-none text-stone-700 leading-relaxed"></textarea>
         <div class="flex justify-end gap-3">
           <button @click="showModal = false" class="px-5 py-2.5 text-stone-500 font-medium hover:bg-stone-100 rounded-xl transition duration-200">取消</button>
           <button @click="submitNote" class="px-5 py-2.5 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 shadow-sm transition duration-200">釘上畫布</button>
@@ -184,9 +184,6 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js'
     import { getDatabase, ref as dbRef, onValue, push, set, get } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js'
 
-    // ==========================================
-    // 您的 Firebase Config (保留真實金鑰不變)
-    // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyBZH3hJleq3Z8AUitrhQquTcYefi8QZAsU",
       authDomain: "e-emotion-game.firebaseapp.com",
@@ -227,9 +224,7 @@
         const customEmotion = ref('');
         const customType = ref('positive');
 
-        // 80 張擴充版情緒卡牌
         const cards = ref([
-          // 40 張正向
           { emotion: '充實', type: 'positive' }, { emotion: '振奮', type: 'positive' }, { emotion: '平靜', type: 'positive' }, { emotion: '喜悅', type: 'positive' }, { emotion: '充滿希望', type: 'positive' },
           { emotion: '感恩', type: 'positive' }, { emotion: '豁然開朗', type: 'positive' }, { emotion: '自信', type: 'positive' }, { emotion: '放鬆', type: 'positive' }, { emotion: '滿足', type: 'positive' },
           { emotion: '期待', type: 'positive' }, { emotion: '熱情', type: 'positive' }, { emotion: '驕傲', type: 'positive' }, { emotion: '受到啟發', type: 'positive' }, { emotion: '感到安全', type: 'positive' },
@@ -239,7 +234,6 @@
           { emotion: '游刃有餘', type: 'positive' }, { emotion: '充滿底氣', type: 'positive' }, { emotion: '坦然', type: 'positive' }, { emotion: '陶醉', type: 'positive' }, { emotion: '雀躍', type: 'positive' },
           { emotion: '振奮人心', type: 'positive' }, { emotion: '備受肯定', type: 'positive' }, { emotion: '充滿靈感', type: 'positive' }, { emotion: '怡然自得', type: 'positive' }, { emotion: '清爽', type: 'positive' },
           
-          // 40 張負向
           { emotion: '疲憊', type: 'negative' }, { emotion: '困惑', type: 'negative' }, { emotion: '焦慮', type: 'negative' }, { emotion: '沮喪', type: 'negative' }, { emotion: '緊張', type: 'negative' },
           { emotion: '無力', type: 'negative' }, { emotion: '孤單', type: 'negative' }, { emotion: '壓力大', type: 'negative' }, { emotion: '煩躁', type: 'negative' }, { emotion: '迷惘', type: 'negative' },
           { emotion: '失落', type: 'negative' }, { emotion: '生氣', type: 'negative' }, { emotion: '擔憂', type: 'negative' }, { emotion: '害怕', type: 'negative' }, { emotion: '沉重', type: 'negative' },
@@ -384,12 +378,14 @@
 
         const totalNotes = computed(() => Object.keys(sharedBoard.value).length);
         
-        // 更新統計邏輯：保留 type 以供渲染顏色
         const wordStats = computed(() => {
           const statsMap = {};
           Object.values(sharedBoard.value).forEach(note => {
             if (!statsMap[note.emotion]) {
-              statsMap[note.emotion] = { count: 0, type: note.type };
+              // 防呆機制：交叉比對卡牌庫，確保舊資料也能抓到正確屬性來上色
+              const cardDef = cards.value.find(c => c.emotion === note.emotion);
+              const determinedType = cardDef ? cardDef.type : (note.type || 'unknown');
+              statsMap[note.emotion] = { count: 0, type: determinedType };
             }
             statsMap[note.emotion].count += 1;
           });
